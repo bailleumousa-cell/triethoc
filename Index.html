@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thắng làm vua, thua thế nào được</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* --- MÀU CỔ ĐIỂN MỚI: Dùng Maroon/Red-800 và Parchment/Beige --- */
+        .classic-text { color: #800000; } /* Maroon/Đỏ Đô đậm */
+        .classic-bg { background-color: #800000; } 
+        .classic-bg-hover:hover { background-color: #5d0000; } /* Maroon đậm hơn khi hover */
+        .classic-light-bg { background-color: #fcf8e8; } /* Parchment/Beige */
+        .classic-border { border-color: #a0522d; } /* Sắc nâu đất cho viền */
+        /* ----------------------------------------------------------------- */
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('nen.jpg'); 
+            background-size: cover; 
+            background-position: center center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed;
+            position: relative; 
+        }
+        
+        /* Lớp giả tạo hiệu ứng mờ (blur) và lớp phủ màu trên hình nền */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* CẬP NHẬT: Lớp phủ tối, mờ ảo hơn */
+            background: rgba(0, 0, 0, 0.3); /* Dark, subtle shadow */
+            backdrop-filter: blur(5px); 
+            z-index: -1; 
+        }
+
+        /* --- HIỆU ỨNG MỚI: Keyframes cho hoạt ảnh --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Hoạt ảnh cho Vua/Winner */
+        @keyframes kingPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+        }
+        
+        /* --- HIỆU ỨNG MỚI: CSS cho con vật chuyển động --- */
+        @keyframes run {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); } 
+        }
+        
+        .animal-container {
+            position: relative; 
+            overflow: hidden; 
+            height: 50px; 
+            margin-top: 1rem;
+        }
+
+        .animal {
+            position: absolute;
+            font-size: 2.5rem; 
+            white-space: nowrap;
+            display: inline-block;
+            animation: run linear infinite; 
+        }
+
+        /* Tùy chỉnh tốc độ cho từng con */
+        #sheep {
+            left: 0;
+            top: 5px;
+            animation-duration: 20s;
+        }
+        #chicken {
+            left: 0;
+            top: 0px;
+            animation-duration: 15s;
+            animation-delay: 5s;
+        }
+        #cow {
+            left: 0;
+            top: 10px;
+            animation-duration: 25s;
+            animation-delay: 10s;
+        }
+        /* ------------------------------------------------ */
+
+
+        /* Lớp tiện ích cho hoạt ảnh */
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .animate-slideInDown {
+            animation: slideInDown 0.5s ease-out forwards;
+        }
+        .animate-king-pulse {
+             animation: kingPulse 1.5s ease-in-out infinite;
+        }
+
+        /* Hoạt ảnh cho đáp án Đúng/Sai */
+        .correct-answer {
+            background-color: #4CAF50 !important; /* Green */
+            color: white !important;
+            animation: pulse 0.6s ease-in-out;
+        }
+        .wrong-answer {
+            background-color: #F44336 !important; /* Red */
+            color: white !important;
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97);
+        }
+
+        /* Hiệu ứng "Pop" cho các nút */
+        .btn-hover-pop {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-hover-pop:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-hover-pop:active {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Hover cho Bảng Xếp Hạng */
+        #scores-list > div {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #scores-list > div:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* CẬP NHẬT: ĐỘ TRONG SUỐT CHO THẺ CHỨA NỘI DUNG */
+        #app {
+            /* Màu giấy da (Parchment/Beige) */
+            background-color: #fcf8e8; 
+            /* Shadow đậm hơn để nổi bật trên nền */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center min-h-screen">
+
+    <div id="app" class="w-full max-w-5xl shadow-2xl rounded-xl p-6 sm:p-8 opacity-0 relative">
+        
+        <h1 id="main-title" class="text-3xl font-extrabold text-center classic-text mb-2">
+            Thắng làm vua, thua thế nào được
+        </h1>
+        <p id="main-subtitle" class="text-center text-gray-700 mb-6">
+            Mỗi câu đúng +100 điểm, câu sai -100 điểm.
+        </p>
+
+        <div id="message-box" class="hidden opacity-0 p-4 rounded-lg text-center font-semibold transition duration-300 mb-6"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <div id="scoreboard-section" class="lg:col-span-1 pt-6 lg:pt-0 border-t lg:border-t-0 border-gray-400 space-y-4 lg:order-2">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-gray-800">Bảng Xếp Hạng & Cấp Bậc</h3>
+                    <button onclick="resetScores()" class="text-sm text-red-700 hover:text-red-900 transition duration-150 btn-hover-pop px-3 py-1 rounded-md">
+                        Đặt Lại Điểm
+                    </button>
+                </div>
+                <div id="scores-list" class="space-y-2">
+                    </div>
+            </div>
+
+            <div id="left-column" class="lg:col-span-2 space-y-6 lg:order-1">
+
+                <div id="quiz-section" class="p-4 border border-gray-300 rounded-lg shadow-md opacity-0 classic-light-bg">
+                    <h2 id="question-text" class="text-xl font-bold mb-4 text-gray-800"></h2>
+                    <div id="choices-container" class="space-y-3">
+                        </div>
+                </div>
+                
+                <div id="winner-slide" class="hidden opacity-0 p-8 border-4 border-yellow-600 rounded-xl shadow-2xl bg-yellow-50 text-center space-y-6">
+                </div>
+
+                <div id="team-management-section" class="hidden bg-yellow-100 p-5 rounded-lg border border-red-300 opacity-0">
+                    <div id="team-selection-ui">
+                        <h3 id="team-section-title" class="text-xl font-bold classic-text mb-4 text-center"></h3>
+                        <p id="team-section-subtitle" class="text-sm text-gray-700 mb-4 text-center"></p>
+                        
+                        <div id="team-buttons-container" class="flex flex-wrap justify-center gap-3">
+                            </div>
+                    </div>
+                    <div id="score-confirmation" class="hidden text-center"></div>
+
+                    <div id="animal-container" class="animal-container">
+                        <span id="sheep" class="animal">🐑</span>
+                        <span id="chicken" class="animal">🐔</span>
+                        <span id="cow" class="animal">🐄</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, query, setDoc, updateDoc, increment, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- CẤU HÌNH FIREBASE VÀ BIẾN TOÀN CỤC ---
+        let app, db, auth;
+        let userId = '';
+        let isOfflineMode = false; 
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app-id';
+        
+        let firebaseConfig = null;
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Lỗi nghiêm trọng: Không thể phân tích cú pháp __firebase_config. Chuyển sang chế độ Offline.");
+            firebaseConfig = null; 
+        }
+        
+        // 7 đội chơi (ĐÃ CẬP NHẬT TÊN MỚI)
+        const TEAMS = [
+            { id: 'team1', name: 'Long Tranh', score: 0 },
+            { id: 'team2', name: 'Hổ Đấu', score: 0 },
+            { id: 'team3', name: 'Bá Vương', score: 0 },
+            { id: 'team4', name: 'Đoạt Ngôi', score: 0 },
+            { id: 'team5', name: 'Ngự Lâm Quân', score: 0 },
+            { id: 'team6', name: 'Phượng Vũ', score: 0 },
+            { id: 'team7', name: 'Kỳ Lân', score: 0 },
+        ];
+        let mockScores = JSON.parse(JSON.stringify(TEAMS)); 
+
+        const TEAM_COLLECTION_PATH = `artifacts/${appId}/public/data/team_scores`;
+
+        // Dữ liệu trắc nghiệm
+        const quizData = [
+            { question: "Cái nào sau đây diễn đạt đúng nhất định nghĩa 'cái chung'?", choices: { A: "Những nét chỉ có ở một sự vật, không lặp lại ở sự vật khác.", B: "Những mặt, những thuộc tính chung tồn tại trong nhiều sự vật, hiện tượng.", C: "Một sự vật, hiện tượng riêng lẻ tồn tại trong không gian và thời gian nhất định.", D: "Một quy tắc áp dụng duy nhất cho mọi trường hợp." }, correctAnswer: 'B' },
+            { question: "Khi áp dụng một quy luật chung vào từng trường hợp cụ thể, điều gì là cần thiết?", choices: { A: "Áp dụng y nguyên, không sửa đổi.", B: "Cá biệt hóa theo điều kiện, hoàn cảnh cụ thể.", C: "Bỏ qua hoàn cảnh cụ thể nếu quy luật đủ mạnh.", D: "Chỉ áp dụng cho một số người có thẩm quyền." }, correctAnswer: 'B' },
+            { question: "Mối quan hệ giữa cái chung, cái riêng và cái đơn nhất trong cùng một sự vật là:", choices: { A: "Hoàn toàn tách rời nhau.", B: "Cái riêng chứa cái chung và cái đơn nhất.", C: "Cái chung tồn tại độc lập, không cần cái riêng.", D: "Cái đơn nhất chứa cái chung." }, correctAnswer: 'B' },
+            { question: "Để nhận thức được 'cái chung', con người cần phải:", choices: { A: "Trực tiếp quan sát ý niệm.", B: "Nghiên cứu các sự vật, hiện tượng cụ thể (cái riêng).", C: "Tưởng tượng ra các quy luật chung.", D: "Bắt đầu từ những khái niệm trừu tượng." }, correctAnswer: 'B' },
+            { question: "Quy luật 'Học đi đôi với hành' là ví dụ cho loại phạm trù nào?", choices: { A: "Cái riêng.", B: "Cái đơn nhất.", C: "Cái chung.", D: "Hiện tượng cụ thể." }, correctAnswer: 'C' },
+            { question: "Hiện tượng nào sau đây là ví dụ của cái chung chuyển thành cái riêng?", choices: { A: "Một phong tục địa phương lan rộng thành phong tục toàn quốc.", B: "Mô hình dạy học truyền thống từng phổ biến nay chỉ còn phù hợp ở vài trường.", C: "Một công nghệ mới được nhiều người áp dụng.", D: "Một sáng kiến cá nhân lan ra toàn xã hội." }, correctAnswer: 'B' },
+            { question: "Phát biểu nào sau đây thể hiện đúng nhất vai trò của cái riêng?", choices: { A: "Là hình thức tồn tại cụ thể của cái chung.", B: "Là cái phổ biến chi phối cái chung.", C: "Là cái duy nhất không có cái chung.", D: "Là sự trừu tượng của tư duy." }, correctAnswer: 'A' },
+            { question: "Điền từ thích hợp vào ô trống: 'Trong nhận thức và thực tiễn, mỗi sự vật vừa có những đặc điểm chung, vừa có những nét riêng và đôi khi mang những nét độc nhất. (...) phản ánh bản chất, quy luật, lặp lại trong nhiều cái riêng, nhưng chỉ tồn tại thông qua các (...) cụ thể. Ngược lại, mỗi (...) đều chứa cái chung, nhưng có điều kiện riêng, nên khi vận dụng cần (...) để phù hợp. (...) có thể trở thành cái chung nếu được lặp lại và công nhận rộng rãi, còn cái chung cũng có thể trở thành cái riêng khi điều kiện thay đổi. Hiểu mối quan hệ biện chứng này giúp vừa khai thác quy luật chung, vừa tôn trọng nét độc đáo cá biệt, tránh kinh nghiệm chủ nghĩa hay giáo điều.' (Lựa chọn là chuỗi 5 từ điền vào 5 chỗ trống theo thứ tự)", choices: { A: "Cái chung, cái riêng, cái riêng, cá biệt hóa, cái đơn nhất.", B: "Cái riêng, cái chung, cái riêng, cá biệt hóa, cái đơn nhất.", C: "Cái tổng thể, cái chung, cái riêng, cái đơn nhất, cá biệt hóa.", D: "Cái riêng, cá biệt hóa, cái chung, cái đơn nhất, cá biệt hóa." }, correctAnswer: 'A' },
+            
+            // --- CÁC CÂU HỎI MỚI ĐƯỢC THÊM VÀO ---
+            { question: "Thủ đô của nước Ý là gì?", choices: { A: "Venice", B: "Milan", C: "Rome", D: "Naples" }, correctAnswer: 'C' },
+            { question: "Hành tinh nào lớn nhất trong Hệ Mặt Trời?", choices: { A: "Trái Đất", B: "Sao Thổ", C: "Sao Mộc", D: "Sao Hỏa" }, correctAnswer: 'C' },
+            { question: "Ai là người viết 'Truyện Kiều'?", choices: { A: "Nguyễn Du", B: "Hồ Xuân Hương", C: "Nguyễn Trãi", D: "Lê Quý Đôn" }, correctAnswer: 'A' },
+            { question: "Ngọn núi cao nhất thế giới là gì?", choices: { A: "K2", B: "Kangchenjunga", C: "Makalu", D: "Everest" }, correctAnswer: 'D' },
+            { question: "Đại dương nào lớn nhất thế giới?", choices: { A: "Đại Tây Dương", B: "Ấn Độ Dương", C: "Thái Bình Dương", D: "Bắc Băng Dương" }, correctAnswer: 'C' }
+        ];
+
+        const TOTAL_QUESTIONS = quizData.length;
+        const SCORE_CHANGE = 100; 
+
+        let gameState = {
+            quizActive: true,
+            currentQuestionIndex: 0,
+            currentTeamId: null,
+            currentTeamName: null,
+            scoresCache: [] // Thêm cache điểm số
+        };
+
+        const PROGRESSION_MAX = 1500; 
+        const TIER_THRESHOLDS = [
+            { name: "Vô gia cư", minScore: -Infinity, maxScore: 299, color: 'bg-gray-500', icon: '🏠' }, 
+            { name: "Nông dân", minScore: 300, maxScore: 599, color: 'bg-yellow-800', icon: '🌾' },
+            { name: "Địa chủ", minScore: 600, maxScore: 899, color: 'bg-green-700', icon: '💰' },
+            /* CẬP NHẬT: Màu quan (Quan) sang Maroon/Đỏ Đô */
+            { name: "Quan", minScore: 900, maxScore: 1199, color: 'bg-red-800', icon: '📜' },
+            { name: "Vua", minScore: 1200, maxScore: Infinity, color: 'bg-red-900', icon: '👑' } 
+        ];
+        
+        function getTierInfo(score) {
+            let selectedTier = TIER_THRESHOLDS[0];
+            let progress = 0;
+            
+            for (const tier of TIER_THRESHOLDS) {
+                if (score >= tier.minScore && score <= tier.maxScore) {
+                    selectedTier = tier;
+                    break;
+                }
+            }
+            const normalizedScore = Math.max(0, score);
+            progress = Math.min(100, (normalizedScore / PROGRESSION_MAX) * 100);
+            
+            return { ...selectedTier, progress };
+        }
+
+        // --- Hàm trợ giúp hoạt ảnh ---
+        function animateElement(elementId, animationClass) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.classList.remove(animationClass, 'opacity-0');
+                // Buộc trình duyệt "reflow" để chạy lại hoạt ảnh
+                void el.offsetWidth;
+                el.classList.add(animationClass);
+            }
+        }
+
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                isOfflineMode = true;
+                console.warn("Chế độ OFFLINE được kích hoạt: Firebase bị vô hiệu hóa.");
+                renderScores(mockScores);
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        initializeTeams(); 
+                        fetchScores();
+                    } else {
+                        userId = crypto.randomUUID(); 
+                        initializeTeams();
+                        fetchScores();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Lỗi khởi tạo hoặc xác thực Firebase:", error);
+                alertMessage(`Lỗi hệ thống: Không thể kết nối (Firebase): ${error.message}`, 'bg-red-100', 'text-red-700');
+                isOfflineMode = true;
+                renderScores(mockScores);
+            }
+        }
+        
+        async function initializeTeams() {
+            if (isOfflineMode || !db) return;
+            // Sử dụng TEAMS (đã cập nhật tên) để khởi tạo
+            for (const team of TEAMS) {
+                const teamDocRef = doc(db, TEAM_COLLECTION_PATH, team.id);
+                try {
+                    const docSnap = await getDoc(teamDocRef);
+                    if (!docSnap.exists()) {
+                        // Nếu chưa tồn tại, tạo mới với tên và điểm 0
+                        await setDoc(teamDocRef, { name: team.name, score: 0 });
+                    } else {
+                        // Nếu đã tồn tại, chỉ cập nhật tên (để đảm bảo tên mới được áp dụng nếu thay đổi)
+                        // Bỏ qua điểm để giữ nguyên điểm cũ
+                        await updateDoc(teamDocRef, { name: team.name });
+                    }
+                } catch (e) {
+                    console.error(`Lỗi khởi tạo/cập nhật đội ${team.name}:`, e);
+                }
+            }
+            // Sau khi đảm bảo tên đúng, fetch lại điểm
+            fetchScores();
+        }
+
+        // --- XỬ LÝ TRẮC NGHIỆM ---
+
+        function renderQuiz() {
+            const teamMgmtSection = document.getElementById('team-management-section');
+            const quizSection = document.getElementById('quiz-section');
+            const winnerSlide = document.getElementById('winner-slide'); 
+            const confirmationDiv = document.getElementById('score-confirmation');
+            const teamSelectionUI = document.getElementById('team-selection-ui');
+            
+            quizSection.classList.add('hidden', 'opacity-0');
+            teamMgmtSection.classList.add('hidden', 'opacity-0');
+            winnerSlide.classList.add('hidden', 'opacity-0'); 
+            confirmationDiv.classList.add('hidden');
+            teamSelectionUI.classList.remove('hidden'); 
+
+            if (gameState.currentQuestionIndex >= TOTAL_QUESTIONS) {
+                // Đã hết câu hỏi, hiển thị slide vinh danh
+                renderFinalWinnerSlide();
+                return;
+            }
+            
+            if (gameState.currentTeamId === null) {
+                teamMgmtSection.classList.remove('hidden'); 
+                quizSection.classList.add('hidden'); 
+                renderTeamSelectionButtons();
+                animateElement('team-management-section', 'animate-fadeIn'); 
+            
+            } else {
+                teamMgmtSection.classList.add('hidden'); 
+                quizSection.classList.remove('hidden'); 
+
+                const currentQuestion = quizData[gameState.currentQuestionIndex];
+                const qNum = gameState.currentQuestionIndex + 1;
+
+                document.getElementById('question-text').className = "text-xl font-bold mb-4 text-gray-800";
+                // CẬP NHẬT: Dùng màu cổ điển cho tên đội
+                document.getElementById('question-text').innerHTML = `
+                    <span class="block text-sm font-medium classic-text">${gameState.currentTeamName} đang trả lời:</span>
+                    Câu hỏi ${qNum}/${TOTAL_QUESTIONS}: ${currentQuestion.question}
+                `;
+                
+                const choicesContainer = document.getElementById('choices-container');
+                choicesContainer.innerHTML = '';
+                
+                const choiceKeys = Object.keys(currentQuestion.choices);
+
+                choiceKeys.forEach(key => {
+                    const button = document.createElement('button');
+                    button.setAttribute('data-choice', key);
+                    // CẬP NHẬT: Bỏ hover indigo-50
+                    button.className = "choice-btn w-full p-4 text-left border border-gray-200 rounded-lg hover:bg-yellow-50 transition duration-150 font-medium text-gray-800 btn-hover-pop";
+                    button.innerHTML = `<span class="font-bold mr-2">${key}.</span> ${currentQuestion.choices[key]}`;
+                    button.onclick = () => handleAnswer(key, currentQuestion.correctAnswer);
+                    choicesContainer.appendChild(button);
+                });
+                
+                gameState.quizActive = true;
+                animateElement('quiz-section', 'animate-fadeIn'); 
+            }
+        }
+
+        // --- HÀM VINH DANH NGƯỜI CHIẾN THẮNG ---
+        function renderFinalWinnerSlide() {
+            const quizSection = document.getElementById('quiz-section');
+            const teamMgmtSection = document.getElementById('team-management-section');
+            const winnerSlide = document.getElementById('winner-slide');
+            const currentScores = isOfflineMode ? mockScores : gameState.scoresCache; 
+            currentScores.sort((a, b) => b.score - a.score);
+            
+            quizSection.classList.add('hidden');
+            teamMgmtSection.classList.add('hidden');
+            winnerSlide.classList.remove('hidden');
+            
+            // 1. Tìm đội chiến thắng (người đứng đầu trong scoresCache đã được sắp xếp)
+            const winner = currentScores.length > 0 ? currentScores[0] : null;
+            
+            if (winner) {
+                // 2. Lấy thông tin cấp bậc của đội chiến thắng
+                const tierInfo = getTierInfo(winner.score);
+                const isKing = tierInfo.name === 'Vua';
+                
+                let titleContent, subtitleContent, winnerClass, winnerIcon, titleColorClass;
+
+                if (isKing) {
+                    // Kịch bản 1: CÓ VUA (Điểm >= 1200)
+                    titleContent = `👑 CHÚC MỪNG VỊ VUA MỚI 👑`;
+                    subtitleContent = `Đội Chiến Thắng Tuyệt Đối Là:`;
+                    winnerClass = 'bg-white border-4 border-yellow-600 shadow-xl';
+                    winnerIcon = '🏆';
+                    titleColorClass = 'text-red-800 animate-king-pulse'; /* CẬP NHẬT: Màu đỏ đậm */
+                } else if (winner.score >= TIER_THRESHOLDS[0].minScore) { 
+                    // Kịch bản 2: CÓ NGƯỜI DẪN ĐẦU, NHƯNG KHÔNG PHẢI VUA (Điểm dương hoặc đạt cấp bậc cao hơn Vô gia cư)
+                    titleContent = `✨ VINH DANH NGƯỜI DẪN ĐẦU ✨`;
+                    subtitleContent = `Đội Xuất Sắc Nhất Giải Đấu Là:`;
+                    winnerClass = 'bg-white border-4 border-red-500 shadow-xl'; /* CẬP NHẬT: Viền đỏ */
+                    winnerIcon = '⭐';
+                    titleColorClass = 'classic-text'; /* CẬP NHẬT: Màu cổ điển */
+                } else {
+                    // Kịch bản 3: KHÔNG ĐỘI NÀO ĐẠT ĐIỂM DƯƠNG CAO (Điểm thấp nhất, dưới 300)
+                    titleContent = `⚠️ KẾT THÚC THỬ THÁCH ⚠️`;
+                    subtitleContent = `Không đội nào vượt qua được ngưỡng thử thách. Đội ít sai sót nhất (Điểm cao nhất) là:`;
+                    winnerClass = 'bg-white border-4 border-gray-400 shadow-xl';
+                    winnerIcon = '😔';
+                    titleColorClass = 'text-gray-600';
+                }
+                
+                // Chuyển class BG thành class Text cho hiển thị cấp bậc
+                const tierTextColorClass = tierInfo.color.replace('bg-', 'text-');
+
+                // 3. Xây dựng nội dung slide vinh danh
+                winnerSlide.innerHTML = `
+                    <h2 class="text-4xl sm:text-6xl font-extrabold ${titleColorClass}">
+                        ${titleContent}
+                    </h2>
+                    <p class="text-xl sm:text-3xl font-bold text-gray-700">${subtitleContent}</p>
+                    
+                    <div class="inline-block px-8 sm:px-12 py-4 sm:py-6 ${winnerClass} rounded-full">
+                        <p class="text-3xl sm:text-5xl font-extrabold classic-text">${winnerIcon} ${winner.name}</p>
+                    </div>
+
+                    <p class="text-lg sm:text-2xl font-semibold text-gray-700">Với Tổng Điểm: 
+                        <span class="font-extrabold ${winner.score < 0 ? 'text-red-700' : 'text-green-700'}">${winner.score}</span> điểm
+                    </p>
+
+                    <div class="text-md sm:text-lg font-medium text-gray-600">
+                        <p>Đã đạt Cấp Bậc: 
+                            <span class="font-bold ${tierTextColorClass}">${tierInfo.icon} ${tierInfo.name}</span>
+                        </p>
+                    </div>
+                    
+                    <button onclick="restartQuiz()" class="mt-4 w-full max-w-xs mx-auto px-4 py-3 classic-bg text-white rounded-lg classic-bg-hover transition duration-150 btn-hover-pop text-lg font-semibold">
+                        Bắt Đầu Vòng Chơi Mới
+                    </button>
+                `;
+            } else {
+                 // Kịch bản 4: KHÔNG CÓ DỮ LIỆU ĐỘI NÀO (Lỗi hoặc chưa chơi)
+                 winnerSlide.innerHTML = `
+                    <h2 class="text-3xl font-extrabold text-red-600">CHƯA CÓ ĐỘI NÀO GHI ĐIỂM!</h2>
+                    <p class="text-xl text-gray-700">Hãy bắt đầu trả lời câu hỏi để tìm ra người chiến thắng.</p>
+                    <button onclick="restartQuiz()" class="mt-4 w-full max-w-xs mx-auto px-4 py-3 classic-bg text-white rounded-lg classic-bg-hover transition duration-150 btn-hover-pop text-lg font-semibold">
+                        Bắt Đầu Chơi
+                    </button>
+                `;
+            }
+
+            animateElement('winner-slide', 'animate-fadeIn'); 
+            document.getElementById('main-title').classList.add('hidden');
+            document.getElementById('main-subtitle').classList.add('hidden');
+        }
+
+        
+        function renderTeamSelectionButtons() {
+            const container = document.getElementById('team-buttons-container');
+            const title = document.getElementById('team-section-title');
+            const subtitle = document.getElementById('team-section-subtitle');
+
+            const qNum = gameState.currentQuestionIndex + 1;
+            const totalQ = TOTAL_QUESTIONS;
+
+            title.className = 'text-xl font-bold classic-text mb-4 text-center';
+            title.innerText = `Bắt đầu Lượt Chơi: Câu hỏi ${qNum}/${totalQ}`;
+            subtitle.innerText = 'Vui lòng chọn đội sẽ trả lời câu hỏi này.';
+            
+            container.innerHTML = '';
+            // CẬP NHẬT: Dùng Flexbox để các nút nằm ngang
+            container.className = "flex flex-wrap justify-center gap-3"; 
+
+            // Lấy danh sách đội từ cache (đã sắp xếp) hoặc mock
+            const currentTeams = (isOfflineMode ? mockScores : gameState.scoresCache).length > 0 
+                                 ? (isOfflineMode ? mockScores : gameState.scoresCache) 
+                                 : TEAMS; // Fallback về TEAMS nếu cache rỗng
+
+            // Hiển thị nút dựa trên danh sách đội (đã có tên mới nếu online)
+            currentTeams.forEach(team => {
+                const button = document.createElement('button');
+                button.setAttribute('data-team-id', team.id);
+                // CẬP NHẬT: Tất cả các đội dùng màu Maroon mới
+                button.className = "team-score-btn w-1/5 min-w-[80px] px-2 py-2 text-sm classic-bg text-white font-semibold rounded-lg classic-bg-hover transition duration-150 shadow-md btn-hover-pop";
+                
+                // Hiển thị tên (ưu tiên tên từ DB/cache, nếu không có dùng tên mặc định từ TEAMS)
+                const teamData = TEAMS.find(t => t.id === team.id);
+                button.innerText = team.name || teamData.name; // Ưu tiên tên từ cache
+
+                button.onclick = () => selectTeam(team.id, team.name || teamData.name);
+                container.appendChild(button);
+            });
+        }
+        
+        window.selectTeam = (teamId, teamName) => {
+            gameState.currentTeamId = teamId;
+            gameState.currentTeamName = teamName;
+            renderQuiz(); 
+        }
+        
+        window.handleAnswer = (selectedAnswer, correctAnswer) => {
+            if (!gameState.quizActive) return;
+
+            gameState.quizActive = false;
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                const choiceKey = btn.getAttribute('data-choice');
+                btn.classList.remove('hover:bg-yellow-50', 'btn-hover-pop'); // CẬP NHẬT: Bỏ hover cũ
+                btn.classList.add('text-gray-500'); // Mờ các nút chưa chọn
+
+                if (choiceKey === selectedAnswer) {
+                    btn.classList.remove('text-gray-500');
+                    btn.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+                } else if (choiceKey === correctAnswer) {
+                    if (!isCorrect) {
+                        btn.classList.add('correct-answer');
+                    }
+                }
+            });
+
+            const scoreChange = isCorrect ? SCORE_CHANGE : -SCORE_CHANGE;
+            
+            // Thêm độ trễ nhỏ để người dùng thấy hiệu ứng
+            setTimeout(() => {
+                if (isCorrect) {
+                    alertMessage(`Chính xác! ${gameState.currentTeamName} được cộng ${SCORE_CHANGE} điểm.`, 'bg-green-100', 'text-green-700');
+                } else {
+                    alertMessage(`Sai rồi. Đáp án đúng là ${correctAnswer}. ${gameState.currentTeamName} bị trừ ${SCORE_CHANGE} điểm.`, 'bg-red-100', 'text-red-700');
+                }
+                recordTeamScore(gameState.currentTeamId, gameState.currentTeamName, scoreChange);
+            }, 700); // 700ms để xem hoạt ảnh
+        }
+        
+        async function recordTeamScore(teamId, teamName, scoreChange) {
+            let success = false;
+            let actionText = scoreChange > 0 ? 'cộng' : 'trừ';
+            let scoreDisplay = Math.abs(scoreChange);
+            
+            if (isOfflineMode) {
+                const teamIndex = mockScores.findIndex(t => t.id === teamId);
+                if (teamIndex !== -1) {
+                    mockScores[teamIndex].score += scoreChange;
+                    renderScores(mockScores);
+                    success = true;
+                }
+            } 
+            else if (db) {
+                try {
+                    const teamDocRef = doc(db, TEAM_COLLECTION_PATH, teamId);
+                    await updateDoc(teamDocRef, {
+                        score: increment(scoreChange), 
+                        lastUpdated: new Date().toISOString(),
+                    });
+                    success = true;
+                } catch (error) {
+                    console.error("Lỗi khi cộng điểm số (Online):", error);
+                    alertMessage(`Lỗi khi cộng điểm: ${error.message}`, 'bg-red-100', 'text-red-700');
+                    return;
+                }
+            } else {
+                alertMessage("Lỗi hệ thống: Không thể ghi điểm vì không có kết nối cơ sở dữ liệu.", 'bg-red-100', 'text-red-700');
+                return;
+            }
+
+            if (success) {
+                const isFinalQuestion = (gameState.currentQuestionIndex + 1) >= TOTAL_QUESTIONS;
+                const teamMgmtSection = document.getElementById('team-management-section');
+                const confirmationDiv = document.getElementById('score-confirmation');
+                const teamSelectionUI = document.getElementById('team-selection-ui');
+
+                teamMgmtSection.classList.remove('hidden', 'opacity-0'); 
+                teamSelectionUI.classList.add('hidden'); 
+                confirmationDiv.classList.remove('hidden'); 
+                
+                confirmationDiv.innerHTML = `
+                    <p class="text-xl font-bold ${scoreChange > 0 ? 'text-green-700' : 'text-red-700'} text-center mb-4">
+                        ✅ ${teamName} đã bị ${actionText} ${scoreDisplay} điểm!
+                        </p>
+                    <button onclick="goToNextQuestion()" class="mt-2 w-full px-4 py-2 classic-bg text-white rounded-lg classic-bg-hover transition duration-150 btn-hover-pop">
+                        ${isFinalQuestion ? 'Xem Kết Quả Cuối Cùng' : 'Chơi Câu Tiếp Theo'}
+                    </button>
+                `;
+                // Chạy hiệu ứng cho phần xác nhận
+                animateElement('team-management-section', 'animate-fadeIn');
+            }
+        };
+        
+        window.resetScores = async () => {
+            const isConfirmed = prompt("CẢNH BÁO: Thao tác này sẽ đặt lại điểm của TẤT CẢ các đội về 0. Gõ 'RESET' để xác nhận.");
+            if (isConfirmed !== 'RESET') {
+                alertMessage("Thao tác đặt lại đã bị hủy.", 'bg-yellow-100', 'text-yellow-700');
+                return;
+            }
+
+            if (isOfflineMode) {
+                mockScores.forEach(team => team.score = 0);
+                renderScores(mockScores);
+                alertMessage("Đã đặt lại điểm số (Chế độ Offline)!", 'bg-green-100', 'text-green-700');
+            }
+            else if (db) {
+                try {
+                    const batch = writeBatch(db);
+                    // Dùng TEAMS (đã cập nhật tên) để reset
+                    for (const team of TEAMS) {
+                        const teamDocRef = doc(db, TEAM_COLLECTION_PATH, team.id);
+                        // Đặt lại điểm về 0 VÀ cập nhật tên (để đảm bảo tên mới được áp dụng khi reset)
+                        batch.set(teamDocRef, { name: team.name, score: 0 });
+                    }
+                    await batch.commit();
+                    alertMessage("Đã đặt lại điểm số của tất cả các đội về 0 và cập nhật tên!", 'bg-green-100', 'text-green-700');
+                } catch (error) {
+                    console.error("Lỗi khi đặt lại điểm số:", error);
+                    alertMessage(`Lỗi khi đặt lại điểm: ${error.message}`, 'bg-red-100', 'text-red-700');
+                    return;
+                }
+            } else {
+                alertMessage("Không thể đặt lại điểm số vì không có kết nối cơ sở dữ liệu.", 'bg-red-100', 'text-red-700');
+                return;
+            }
+            
+            gameState.currentQuestionIndex = 0;
+            gameState.currentTeamId = null; 
+            gameState.currentTeamName = null;
+
+            document.getElementById('main-title').classList.remove('hidden');
+            document.getElementById('main-subtitle').classList.remove('hidden');
+            renderQuiz(); 
+        };
+
+        function fetchScores() {
+            if (isOfflineMode || !db) {
+                // Nếu offline, hiển thị mockScores (đã cập nhật tên)
+                renderScores(mockScores);
+                return;
+            }
+
+            const scoresCollectionRef = collection(db, TEAM_COLLECTION_PATH);
+            const q = query(scoresCollectionRef);
+
+            onSnapshot(q, (snapshot) => {
+                let scores = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    scores.push({ id: doc.id, ...data });
+                });
+                
+                // Đảm bảo tất cả 7 đội đều được hiển thị, ngay cả khi DB chưa có đủ
+                for (const defaultTeam of TEAMS) {
+                    if (!scores.find(s => s.id === defaultTeam.id)) {
+                        scores.push({ ...defaultTeam }); // Thêm đội mặc định nếu thiếu
+                    }
+                }
+                // Cập nhật tên từ TEAMS cho chắc chắn (vì fetchScores có thể chạy trước initializeTeams)
+                scores = scores.map(score => {
+                    const defaultTeam = TEAMS.find(t => t.id === score.id);
+                    return { ...score, name: defaultTeam.name }; // Luôn dùng tên mới nhất từ code
+                });
+
+
+                scores.sort((a, b) => b.score - a.score);
+                gameState.scoresCache = scores; // Cập nhật cache điểm số
+                renderScores(scores);
+            }, (error) => {
+                console.error("Lỗi khi lắng nghe điểm số:", error);
+                document.getElementById('scores-list').innerHTML = `<p class="text-red-500">Không thể tải bảng xếp hạng.</p>`;
+                // Fallback về mock nếu lỗi
+                renderScores(mockScores);
+            });
+        }
+
+        function renderScores(scores) {
+            const scoresList = document.getElementById('scores-list');
+            scoresList.innerHTML = ''; 
+
+            if (scores.length === 0) {
+                scoresList.innerHTML = `<p class="text-gray-500 text-center py-4">Chưa có điểm số đội nào được lưu.</p>`;
+                return;
+            }
+            
+            // Sắp xếp lại trước khi render
+            scores.sort((a, b) => b.score - a.score);
+
+            scores.forEach((score, index) => {
+                const scoreItem = document.createElement('div');
+                const tierInfo = getTierInfo(score.score); 
+                const rank = index + 1;
+                let bgColor = 'bg-white';
+                
+                if (rank === 1) bgColor = 'bg-yellow-100 border-yellow-500';
+                else if (rank === 2) bgColor = 'bg-gray-100 border-gray-400';
+                else if (rank === 3) bgColor = 'bg-orange-100 border-orange-400';
+                else bgColor = 'bg-white border-gray-200';
+
+                // Thay thế tierInfo.color bằng tierTextColorClass (text-...)
+                const tierTextColorClass = tierInfo.color.replace('bg-', 'text-');
+
+                // CẬP NHẬT: Nền bảng điểm dùng màu giấy da
+                scoreItem.className = `p-4 rounded-lg border shadow-lg classic-light-bg space-y-2`;
+                
+                // Đảm bảo hiển thị tên chính xác (từ score.name, đã được chuẩn hóa ở fetchScores)
+                const teamName = score.name || TEAMS.find(t => t.id === score.id)?.name || 'Đội không tên';
+
+                scoreItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <span class="font-extrabold text-xl classic-text w-6 text-center">${rank}.</span>
+                            <span class="font-bold text-lg text-gray-800">${teamName}</span>
+                        </div>
+                        <div class="text-right flex items-center space-x-2">
+                            <p class="text-sm font-semibold text-gray-700 flex items-center ${tierTextColorClass}">
+                                ${tierInfo.icon} <span class="ml-1">${tierInfo.name}</span>
+                            </p>
+                            <span class="font-bold text-2xl ${score.score < 0 ? 'text-red-700' : 'text-green-700'}">${score.score}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full bg-gray-300 rounded-full h-2.5">
+                        <div class="h-2.5 rounded-full transition-all duration-500 ${tierInfo.color}" 
+                             style="width: ${tierInfo.progress}%;">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600 text-right">
+                        Tiến độ đến cấp bậc Vua (1500 điểm): ${Math.round(tierInfo.progress)}%
+                    </p>
+                `;
+                scoresList.appendChild(scoreItem);
+            });
+        }
+        
+        // Hàm thông báo dùng hoạt ảnh
+        function alertMessage(text, bgColorClass, textColorClass) {
+            const messageBox = document.getElementById('message-box');
+            // Đặt lại hoạt ảnh
+            messageBox.classList.remove('animate-slideInDown');
+            void messageBox.offsetWidth; // Buộc reflow
+
+            messageBox.classList.remove('hidden', 'opacity-0', 'bg-red-100', 'bg-green-100', 'bg-yellow-100', 'text-red-700', 'text-green-700', 'text-yellow-700');
+            messageBox.classList.add(bgColorClass, textColorClass, 'animate-slideInDown');
+            messageBox.innerText = text;
+            messageBox.classList.remove('hidden');
+            
+            // Xóa bộ đếm thời gian cũ nếu có
+            if (messageBox.timer) {
+                clearTimeout(messageBox.timer);
+            }
+
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden'); 
+                messageBox.classList.remove('animate-slideInDown'); // Dọn dẹp
+                messageBox.classList.add('opacity-0');
+            }, 5000);
+        }
+
+        // --- KHỞI CHẠY ỨNG DỤNG ---
+        window.onload = function () {
+            console.log("Ứng dụng Quiz Đội Chơi đang khởi tạo...");
+            
+            // Chạy hiệu ứng fade-in cho thẻ chính
+            const appCard = document.getElementById('app');
+            appCard.classList.add('animate-fadeIn');
+            appCard.classList.remove('opacity-0');
+
+            initializeFirebase(); 
+            // Gọi renderQuiz() để hiển thị UI ban đầu (chọn đội)
+            // Ngay cả khi online, hàm này sẽ hiển thị UI chọn đội.
+            renderQuiz(); 
+        };
+
+        // Gắn các hàm vào window để có thể gọi từ HTML
+        window.resetScores = resetScores; 
+        window.renderQuiz = renderQuiz;
+        window.handleAnswer = handleAnswer;
+        window.selectTeam = selectTeam;
+
+        window.restartQuiz = () => {
+            gameState.currentQuestionIndex = 0;
+            gameState.currentTeamId = null; 
+            gameState.currentTeamName = null;
+            
+            document.getElementById('main-title').classList.remove('hidden');
+            document.getElementById('main-subtitle').classList.remove('hidden');
+            renderQuiz();
+        };
+
+        window.goToNextQuestion = () => {
+            gameState.currentQuestionIndex++;
+            gameState.currentTeamId = null; 
+            gameState.currentTeamName = null;
+            renderQuiz();
+        };
+
+    </script>
+</body>
+</html>
